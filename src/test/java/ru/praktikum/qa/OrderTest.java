@@ -9,8 +9,11 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// Тестовый класс для проверки полного сценария оформления заказа самоката.
+// Используется параметризованный тест для запуска в разных браузерах и с разными данными.
 public class OrderTest {
 
+    // Параметризованный тест, который проверяет процесс оформления заказа
     @ParameterizedTest
     @CsvSource({
             // браузер, имя, фамилия, адрес, метро, телефон, дата, срок аренды, комментарий
@@ -30,16 +33,20 @@ public class OrderTest {
             WebDriverManager.firefoxdriver().setup();
             driver = new FirefoxDriver();
         } else {
+            // Если браузер не поддерживается, выбрасываем исключение
             throw new IllegalArgumentException("Неизвестный браузер: " + browser);
         }
 
         try {
+            // Открываем главную страницу сайта
             driver.get("https://qa-scooter.praktikum-services.ru/");
 
+            // Создаем объект главной страницы и закрываем баннер cookie
             MainPage mainPage = new MainPage(driver);
             mainPage.closeCookieBanner();
             mainPage.clickTopOrderButton();
 
+            // Заполняем первый шаг формы заказа
             OrderPageStepOne stepOne = new OrderPageStepOne(driver);
             stepOne.fillFirstName(firstName);
             stepOne.fillLastName(lastName);
@@ -48,6 +55,7 @@ public class OrderTest {
             stepOne.fillPhone(phone);
             stepOne.clickNext();
 
+            // Заполняем второй шаг формы заказа
             OrderPageStepTwo stepTwo = new OrderPageStepTwo(driver);
             stepTwo.setDate(date);
             stepTwo.chooseRentalPeriod(period);
@@ -55,12 +63,15 @@ public class OrderTest {
             stepTwo.setComment(comment);
             stepTwo.clickOrder();
 
+            // Подтверждаем заказ в модальном окне
             ConfirmationModal modal = new ConfirmationModal(driver);
             modal.confirmOrder();
 
+            // Проверяем, что появилось подтверждение успешного заказа
             assertTrue(modal.isOrderCompleteVisible(), "Заказ не был оформлен");
 
         } finally {
+            // Закрываем браузер
             driver.quit();
         }
     }

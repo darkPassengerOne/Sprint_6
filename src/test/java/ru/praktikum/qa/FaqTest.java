@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// Тестовый класс для проверки ответов на часто задаваемые вопросы (FAQ) на сайте.
 public class FaqTest {
 
     // Метод для нормализации текста: убирает лишние пробелы и переносы строк
@@ -18,6 +19,8 @@ public class FaqTest {
         return text.trim().replaceAll("\\s+", " ");
     }
 
+    // Параметризованный тест, который проверяет ответы на вопросы FAQ.
+    // Для каждого вопроса проверяется, что ответ на сайте совпадает с ожидаемым.
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
             "0|Сутки — 400 рублей. Оплата курьеру — наличными или картой.",
@@ -30,19 +33,22 @@ public class FaqTest {
             "7|Да, обязательно. Всем самокатов! И Москве, и Московской области."
     })
     public void testFaqAnswers(int questionIndex, String expectedAnswer) {
+        // Устанавливаем драйвер для Chrome с помощью WebDriverManager
         WebDriverManager.chromedriver().setup();
+        // Инициализируем браузер Chrome
         WebDriver driver = new ChromeDriver();
+        // Открываем страницу сайта с FAQ
         driver.get("https://qa-scooter.praktikum-services.ru/");
 
         // Закрываем cookie баннер
         MainPage mainPage = new MainPage(driver);
         mainPage.closeCookieBanner();
-
+        // Получаем текст ответа на вопрос с индексом questionIndex
         String actualAnswer = mainPage.getFaqAnswerText(questionIndex);
 
-        // Нормализуем оба текста перед сравнением
+        // Сравниваем нормализованные ожидаемый и фактический тексты ответов
         assertEquals(normalize(expectedAnswer), normalize(actualAnswer), "Текст ответа не совпадает");
-
+        // Закрываем браузер
         driver.quit();
     }
 }
